@@ -73,6 +73,10 @@ public:
 
     uint32_t get_discarded_packets() const {return decoder->get_discarded_packets();}
 
+    void print_buf() {
+        return decoder->print_buf();
+    }
+
 };
 
 #endif //RPCLITE_CLIENT_H

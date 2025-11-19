@@ -263,6 +263,21 @@ public:
 
     friend class DecoderTester;
 
+    void print_buf() {
+        Serial.print("-- decoder buffer stored: ");
+        Serial.print(_bytes_stored);
+        Serial.print("/");
+        Serial.print(BufferSize);
+        Serial.println(" --");
+
+        for (size_t i = 0; i < _bytes_stored; i++) {
+            Serial.print("0x");
+            Serial.print(_raw_buffer[i], HEX);
+            Serial.print(" ");
+        }
+        Serial.println("\n...................");
+    }
+
 private:
     ITransport* _transport;
     uint8_t _raw_buffer[BufferSize]{};
