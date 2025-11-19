@@ -186,11 +186,12 @@ public:
     }
 
     void parse_packet(){
-
+        Serial.println("-- decoder parsing --");
         size_t offset = 0;
 
         if (packet_incoming()) {
             if (response_queued()) {
+                Serial.println("a response is queued");
                 return;
             }
             offset = _response_offset;
@@ -204,10 +205,17 @@ public:
         while (bytes_checked + offset < _bytes_stored){
             bytes_checked++;
             unpacker.clear();
-            if (!unpacker.feed(_raw_buffer + offset, bytes_checked)) continue;
+            if (!unpacker.feed(_raw_buffer + offset, bytes_checked)) {
+                Serial.print("not serializable @ ");
+                Serial.println(offset);
+                Serial.print("checked bytes: ");
+                Serial.println(bytes_checked);
+                Serial.print("bytes stored: ");
+                Serial.print(_bytes_stored);
+                continue;}
 
             if (unpackTypedArray(unpacker, container_size, type)) {
-
+                Serial.println("-- decoder found smthg --");
                 if (type != CALL_MSG && type != RESP_MSG && type != NOTIFY_MSG) {
                     consume(bytes_checked, offset);
                     _discarded_packets++;
@@ -276,6 +284,23 @@ public:
             Serial.print(" ");
         }
         Serial.println("\n...................");
+        Serial.println("-- decoder buffer status --");
+        Serial.print("_packet_type:");
+        Serial.print(_packet_type);
+        Serial.print(" | _packet_size:");
+        Serial.print(_packet_size);
+        Serial.print("| _response_offset:");
+        Serial.print(_response_offset);
+        Serial.print(" | _response_size:");
+        Serial.print(_response_size);
+        Serial.print(" | value @ offset:0x");
+        Serial.print(_raw_buffer[_response_offset], HEX);
+        Serial.print(" | _msg_id:");
+        Serial.print(_msg_id);
+        Serial.print(" | _discarded_packets:");
+        Serial.print(_discarded_packets);
+        Serial.println("\n...................");
+
     }
 
 private:
