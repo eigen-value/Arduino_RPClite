@@ -111,9 +111,8 @@ public:
             }
         }
 
-        consume(_response_size, _response_offset);
-        reset_response();
         if (_response_offset == 0) reset_packet();
+        consume(_response_size, _response_offset);
 
         return true;
     }
@@ -197,11 +196,8 @@ public:
         size_t offset = 0;
 
         if (packet_incoming()) {
-            offset = _response_offset;
-        }
-
-        if ((offset > 0) && response_queued()) {
-            return;
+            if (response_queued()) return;  // parsing complete
+            offset = _response_offset;      // looking for a RESP
         }
 
         size_t bytes_checked = 0;
@@ -236,7 +232,7 @@ public:
                 if (type == RESP_MSG) {
                     _response_offset = offset;
                     _response_size = bytes_checked; // response queued
-                } else if (offset > 0) {
+                } else {
                     _response_offset = offset + bytes_checked;
                 }
 
